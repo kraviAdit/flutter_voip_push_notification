@@ -1,6 +1,7 @@
 #import "FlutterVoipPushNotificationPlugin.h"
 
-NSString *const FlutterVoipRemoteNotificationsRegistered = @"voipRemoteNotificationsRegistered";
+NSString *
+st FlutterVoipRemoteNotificationsRegistered = @"voipRemoteNotificationsRegistered";
 NSString *const FlutterVoipLocalNotificationReceived = @"voipLocalNotificationReceived";
 NSString *const FlutterVoipRemoteNotificationReceived = @"voipRemoteNotificationReceived";
 

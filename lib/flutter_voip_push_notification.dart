@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 /// or false if its a remote voip push notification
 /// [message] contains the notification payload see link below for how to parse this data
 /// https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW1
-typedef Future<dynamic> MessageHandler(
+typedef FutureOr<dynamic> MessageHandler(
     bool isLocal, Map<String, dynamic> notification);
 
 class NotificationSettings {
@@ -40,7 +40,7 @@ class NotificationSettings {
 class LocalNotification {
   const LocalNotification({
     required this.alertBody,
-    required this.alertAction,
+    this.alertAction = 'view',
     this.soundName,
     this.category,
     this.userInfo,
@@ -91,7 +91,7 @@ class FlutterVoipPushNotification {
   late String _token;
   late MessageHandler _onMessage;
   late MessageHandler _onResume;
-
+  late void Function(String message)? _debug;
 
   final StreamController<String> _tokenStreamController =
       StreamController<String>.broadcast();
@@ -105,15 +105,18 @@ class FlutterVoipPushNotification {
   void configure({
     required MessageHandler onMessage,
     required MessageHandler onResume,
+    void Function(String message)? debug,
   }) {
     _onMessage = onMessage;
     _onResume = onResume;
+    _debug = debug;
     _channel.setMethodCallHandler(_handleMethod);
-    _channel.invokeMethod<void>('configure');
+    //_channel.invokeMethod<void>('configure');
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     final Map map = call.arguments.cast<String, dynamic>();
+    _debug?.call('_handleMethod: ${call.method}');
     switch (call.method) {
       case "onToken":
         _token = map["deviceToken"];
@@ -138,8 +141,7 @@ class FlutterVoipPushNotification {
   /// Prompts the user for notification permissions the first time
   /// it is called.
   Future<void> requestNotificationPermissions(
-      [NotificationSettings iosSettings =
-          const NotificationSettings()]) async {
+      [NotificationSettings iosSettings = const NotificationSettings()]) async {
     _channel.invokeMethod<void>(
         'requestNotificationPermissions', iosSettings.toMap());
   }
