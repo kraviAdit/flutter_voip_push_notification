@@ -18,8 +18,10 @@ void main() {
     // Verify that voip push token is received
     expect(
       find.byWidgetPredicate(
-        (Widget widget) => widget is Text &&
-                           widget.data.startsWith('Received Voip Push token received:'),
+        (Widget widget) =>
+            widget is Text &&
+            (widget.data?.startsWith('Received Voip Push token received:') ??
+                false),
       ),
       findsOneWidget,
     );
